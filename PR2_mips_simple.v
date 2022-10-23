@@ -184,6 +184,7 @@ module BranchControl(Zero, Beq, Bne, Out);
   not invertZero(Zero, notZero);
   and and1(Beq, Zero, BeqAndZero), and2(Bne, notZero, BneAndNotZero);
   or BranchControlOut(BeqAndZero,BneAndNotZero,Out);
+endmodule
   
 
 module ALUControl (ALUOp,FuncCode,ALUCtl); 
