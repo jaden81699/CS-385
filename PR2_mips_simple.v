@@ -180,11 +180,11 @@ endmodule
 module BranchControl(Zero, Beq, Bne, Out);
   input Zero, Beq, Bne;
   output Out;
-  wire BeqAndZero, notZero;
-  not invertZero(Zero, notZero);
-  and and1(Beq, Zero, BeqAndZero), and2(Bne, notZero, BneAndNotZero);
-  or BranchControlOut(BeqAndZero,BneAndNotZero,Out);
-endmodule
+  wire BeqAndZero, BneAndNotZero;
+  not invertZero(notZero,Zero);
+  and and1(BeqAndZero, Beq, Zero), and2(BneAndNotZero,Bne, notZero);
+  or BranchControlOut(Out, BeqAndZero, BneAndNotZero);
+  endmodule
   
 
 module ALUControl (ALUOp,FuncCode,ALUCtl); 
@@ -219,14 +219,15 @@ module CPU (clock,WD,IR,PC);
     IMemory[0] = 16'b1000_00_01_00000000;  // lw $1, 0($0) 
     IMemory[1] = 16'b1000_00_10_00000010;  // lw $2, 2($0)
     IMemory[2] = 16'b0110_01_10_11_000000;  // slt $3, $1, $2
-    IMemory[3] = 16'b1010_11_00_00000010;  // beq $3, $0, IMemory[6] 
-    IMemory[4] = 16'b1001_00_01_00000010;  // sw $1, 2($0) 
-    IMemory[5] = 16'b1001_00_10_00000000;  // sw $2, 0($0) 
-    IMemory[6] = 16'b1000_00_01_00000000;  // lw $1, 0($0) 
-    IMemory[7] = 16'b1000_00_10_00000010;  // lw $2, 2($0)
-    IMemory[8] = 16'b0100_10_10_10_000000;  // nor $2, $2, $2 (sub $3, $1, $2 in two's complement)
-    IMemory[9] = 16'b0111_10_10_00000001;  // addi $2, $2, 1 
-    IMemory[10] = 16'b0000_01_10_11_000000;  // add $3, $1, $2 
+    IMemory[3] = 16'b1010_11_00_00000011;  // beq $3, $0, IMemory[6]
+    IMemory[4] = 16'b1011_11_00_00000010;  // bne $3, $0, IMemory[6]
+    IMemory[5] = 16'b1001_00_01_00000010;  // sw $1, 2($0) 
+    IMemory[6] = 16'b1001_00_10_00000000;  // sw $2, 0($0) 
+    IMemory[7] = 16'b1000_00_01_00000000;  // lw $1, 0($0) 
+    IMemory[8] = 16'b1000_00_10_00000010;  // lw $2, 2($0)
+    IMemory[9] = 16'b0100_10_10_10_000000;  // nor $2, $2, $2 (sub $3, $1, $2 in two's complement)
+    IMemory[10] = 16'b0111_10_10_00000001;  // addi $2, $2, 1 
+    IMemory[11] = 16'b0000_01_10_11_000000;  // add $3, $1, $2 
     
  // Data
     DMemory [0] = 16'd5; // swap the cells and see how the simulation output changes
@@ -246,7 +247,7 @@ module CPU (clock,WD,IR,PC);
   //assign WD = (MemtoReg) ? DMemory[ALUOut>>1]: ALUOut; // Behavioral MemtoReg Mux
    _16bitMUX2x1 _16bitMUX2(B,RD2,SignExtend,ALUSrc); // ALUSrc Mux
   //assign B  = (ALUSrc) ? SignExtend: RD2; // Behavioral ALUSrc Mux 
-  BranchControl BranchControl(Zero, Beq, Bne, Out); //branch control gate-level
+  BranchControl BranchControl1(Zero, Beq, Bne, Out); //branch control gate-level
   _16bitMUX2x1 _16bitMUX3(NextPC,PCplus4,Target,Out);
   //assign NextPC = (Beq && Zero || Bne && ~Zero) ? Target: PCplus4; // Behavioral Branch Mux
   always @(negedge clock) begin 
