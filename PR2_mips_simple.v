@@ -39,7 +39,7 @@ module alu (ALUct1,A,B,ALUOut,Zero);
    ALUOut[7],ALUOut[8],ALUOut[9],ALUOut[10],ALUOut[11],ALUOut[12],ALUOut[13], ALUOut[14],ALUOut[15]);
 endmodule
 
-// 1-bit ALU for bits 0-2
+// 1-bit ALU for bits 0-14
 module ALU1 (a,b,ainvert,binvert,op,less,carryin,carryout,result);
    input a,b,less,carryin,ainvert,binvert;
    input [1:0] op;
@@ -56,7 +56,7 @@ module ALU1 (a,b,ainvert,binvert,op,less,carryin,carryout,result);
   
 endmodule
 
-// 1-bit ALU for the most significant bit
+// 1-bit ALU for the most significant bit (bit 15)
 module ALUmsb (a,b,ainvert,binvert,op,less,carryin,carryout,result,sum);
    input a,b,less,carryin,ainvert,binvert;
    input [1:0] op;
